@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Include Leaflet CSS and JavaScript files -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <!-- Include jQuery for making AJAX requests -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <!-- Create a map container -->
+    <div id="map" style="height: 300px;"></div>
+    
+    <!-- Input field for the user to enter an address -->
+    <input type="text" id="addressInput" placeholder="Enter an address" />
+    <button onclick="geocodeAddress()">Geocode</button>
+
+    <script>
+        var map = L.map('map').setView([0, 0], 13); // Initialize map with default location (0, 0)
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        async function geocodeAddress() {
+            var address = $('#addressInput').val();
+            const url = 'https://geocoding-by-api-ninjas.p.rapidapi.com/v1/geocoding?city=' + encodeURIComponent(address);
+        
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-RapidAPI-Key': 'c3aa05e167msh3ba19911f4f7c22p1a4d86jsn9e2e846aaaf6',
+                        'X-RapidAPI-Host': 'geocoding-by-api-ninjas.p.rapidapi.com'
+                    }
+                });
+                const data = await response.json();
+                console.log(data); // Log the entire response for reference
+        
+                if (data.length > 0) {
+                    var latitude = data[0].latitude;
+                    var longitude = data[0].longitude;
+        
+                    // Set the map view to the obtained coordinates
+                    map.setView([latitude, longitude], 13);
+        
+                    L.marker([latitude, longitude]).addTo(map)
+                        .bindPopup(address)
+                        .openPopup();
+                } else {
+                    console.error('Location not found');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        
+        
+    </script>
+</body>
+</html>
+detail.html
+{% extends 'base.html'%}
+{% block content %}
+<div class="grid grid-cols-5 gap-6"style="margin-top:90px;">
+    <div class="col-span-3">
+        <img src="{{item.image.url}}" class="rounded-xl" style="height: 600px; width: 600px;">
+    </div>
+    <div class="col-span-2 p-6 bg-black-100 rounded-xl">
+        <h1 class="nb-6 text-3xl">{{item.name}}</h1>
+        <p class="text-gray-500"><strong>Price:</strong>{{item.price}}</p>
+        <p class="text-gray-500"><strong>Seller:</strong>{{item.created_by.username}}</p>
+        <p class="text-gray-700">
+            <strong class="text-gray-500">Description:</strong><br>
+            {{item.description}}
+        </p>
+        {% if request.user == item.created_by %}
+         <div class="mt-6 p-6 bg-white rounded-xl">
+            <p>This is Your Item!</p>
+            <a href="{% url 'item:edit' item.id %}" class="inline-block mt-6 px-6 py-3 text-lg font-semibold text-white rounded-xl bg-green-500">Edit</a>
+            <a href='{% url "item:delete" item.id %}' class="inline-block mt-6 px-6 py-3 text-lg font-semibold text-white rounded-xl bg-red-500">Delete</a>
+         </div>
+        {% else %}
+            <a href="#" class="inline-block mt-6 px-6 py-3 text-lg font-semibold bg-teal-500 text-white hover:bg-teal-700 rounded-xl">Contact Seller</a>
+        {% endif %}
+        </div>  
+</div>
+<div id="map" style="height: 300px; position: static;"></div>
+<input type="hidden" id="village" value="{{ item.village }}">
+<input type="hidden" id="district" value="{{ item.district }}">
+<input type="hidden" id="state" value="{{ item.state }}">
+
+<script>
+    // Combine item.country, item.state, and item.district with proper formatting
+    const village = document.getElementById("village").value;
+    const district = document.getElementById("district").value;
+    const state = document.getElementById("state").value;
+
+    // Combine the retrieved values to form the address
+    const addressComponents = [village, district, state];
+    const address = addressComponents.join(', ');
+
+    // Rest of your JavaScript code
+    console.log(address);
+
+    // Call the geocodeAddress function with the formatted address
+    geocodeAddress(address);
+
+    // Initialize the map
+    var map = L.map('map').setView([0, 0], 13);
+
+    // Add an OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    async function geocodeAddress(address) {
+        const url = 'https://geocoding-by-api-ninjas.p.rapidapi.com/v1/geocoding?city=' + encodeURIComponent(address);
+    
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-RapidAPI-Key': 'c3aa05e167msh3ba19911f4f7c22p1a4d86jsn9e2e846aaaf6',
+                    'X-RapidAPI-Host': 'geocoding-by-api-ninjas.p.rapidapi.com'
+                }
+            });
+            const data = await response.json();
+            console.log(data);
+
+            if (data.length > 0) {
+                var latitude = data[0].latitude;
+                var longitude = data[0].longitude;
+    
+                map.setView([latitude, longitude], 13);
+    
+                L.marker([latitude, longitude]).addTo(map)
+                  .bindPopup(address.split(', ').slice(0, 2).join(', '))
+                  .openPopup();
+
+            } else {
+                console.error('Location not found');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>
+
+<div class="mt-6 px-6 py-12 bg-gray-100 round-xl">
+    {% if releateditems|length > 0 %}
+    <h2 class="nb-12 text-2xl text-center">SIMILAR ITEMS</h2>
+   <div class="grid grid-cols-4 gap-3">
+    {% for item in releateditems  %}
+    <div>
+        <a href="{% url 'item:detail' item.id %}">
+            <div>
+                <img src="{{item.image.url}}" class="rounded-t-xl h-305.86" style="height: 200px; width: 283px;">
+            </div>
+            <div class="p-6 bg-white rounded-b-xl">
+                <h2 class="text-2xl">{{item.name}}</h2>
+                <p class="text-gray-500">Price:{{item.price}}</p>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+   </div>
+   {% endif %}
+</div>
+{% endblock %}

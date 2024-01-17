@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin-top:90px;">
+<h1 class="mb-6 text-3xl flex justify-center font-bold">New conversation</h1>
+<form action="." method="post">
+    {% csrf_token %}
+    <div class="space-y-4">
+        {{form.as_p}}
+    </div>
+    <input class="py-4 px-8 text-lg bg-teal-500 hover:bg-teal-800 rounded-xl text-white" type="submit" value="Send">
+</form>
+</div>
+{% endblock%}
+

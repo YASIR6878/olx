@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Get Current Location</title>
+</head>
+<body>
+    <h1>Get Current Location</h1>
+
+    <p id="location-info"></p>
+    <p id="address-info"></p>
+    <button id="get-location-button">Get My Location</button>
+
+    <script>
+        if ("geolocation" in navigator) {
+            const locationInfo = document.getElementById("location-info");
+            const addressInfo = document.getElementById("address-info");
+            const getLocationButton = document.getElementById("get-location-button");
+
+            getLocationButton.addEventListener("click", async function () {
+                // Request user's current location
+                navigator.geolocation.getCurrentPosition(async function (position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    locationInfo.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+
+                    // Reverse geocoding using the specified API
+                    const reverseGeocodeUrl = `https://forward-reverse-geocoding.p.rapidapi.com/v1/forward?lat=${latitude}&lon=${longitude}&accept-language=en&polygon_threshold=0.0`;
+                    const reverseGeocodeOptions = {
+                        method: 'GET',
+                        headers: {
+                            'X-RapidAPI-Key': 'c3aa05e167msh3ba19911f4f7c22p1a4d86jsn9e2e846aaaf6',
+                            'X-RapidAPI-Host': 'forward-reverse-geocoding.p.rapidapi.com'
+                        }
+                    };
+
+                    try {
+                        const reverseGeocodeResponse = await fetch(reverseGeocodeUrl, reverseGeocodeOptions);
+                        const reverseGeocodeData = await reverseGeocodeResponse.json();
+                        console.log(reverseGeocodeData); // Debug: Log the response
+
+                        if (reverseGeocodeData[0] && reverseGeocodeData[0].address) {
+                            // Extract address components
+                            const addressData = reverseGeocodeData[0].address;
+
+                            // Construct the complete address
+                            const completeAddress = `${addressData.amenity}, ${addressData.house_number}, ${addressData.road}, ${addressData.neighbourhood}, ${addressData.suburb}, ${addressData.county}, ${addressData.state}, ${addressData.postcode}, ${addressData.country}`;
+
+                            // Display the user's address
+                            addressInfo.textContent = `User's Address: ${completeAddress}`;
+                        } else {
+                            addressInfo.textContent = "Address not found";
+                        }
+                    } catch (error) {
+                        addressInfo.textContent = "Error fetching address";
+                        console.error("Error fetching address:", error);
+                    }
+                }, function (error) {
+                    locationInfo.textContent = "Geolocation error";
+                    console.error("Geolocation error:", error);
+                });
+            });
+        } else {
+            // Geolocation is not available
+            document.getElementById("location-info").textContent = "Geolocation is not available";
+        }
+    </script>
+</body>
+</html>

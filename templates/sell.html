@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .underform{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80%;
+        margin-left: 131px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    }
+</style>
+<div style="margin-top: 90px;">
+    <form action="sell" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+    <div class="underform">
+     <div class="formdata" style="margin-left: 7cm; width: 828px;">
+        <h1 style="margin-left: 132px;font-weight: bolder;font-size: 25px;">Product Details</h1>
+
+        {{form.as_p}}
+        <input class="textbox" type="file" name="img1">
+        <input class="textbox" type="file" name="img2">
+        <input class="textbox" type="file" name="img3">
+     </div>
+     </div>
+     <input class="py-4 px-8 flex justify-center text-lg bg-teal-500 hover:bg-teal-800 rounded-xl text-white" type="submit" value="Sell" style="margin-left: 15cm;margin-top: 12px;">
+    </form>
+</div>
+{% endblock content %}

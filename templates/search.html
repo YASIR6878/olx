@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .outer a {
+        text-decoration: none;
+        
+    }
+</style>
+
+<div class="flex outer"style="margin-top:90px;">
+
+
+    <div class="col-span-3">
+        <div class="grid grid-cols-3 gap-1 bg-gray-100">
+            {% if items|length > 0 %}
+            {% for item in items  %}
+            <div>
+                <a href="{% url 'item:detail' item.id %}">
+                    <div>
+                        <img src="{{item.image1.url}}" class="rounded-t-xl" style="height: 200px; width: 283px;">
+                    </div>
+                    <div class="p-6 bg-white rounded-b-xl ml-9">
+                        <h2 class="text-2xl">{{item.name}}</h2>
+                        <p class="text-gray-500">Price:{{item.price}}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty" style="display: flex; justify-content: center; height: 100%; width: 70%; margin-left: 10cm;">
+            <img src="https://st4.depositphotos.com/7819052/21803/v/450/depositphotos_218033152-stock-illustration-grunge-red-available-word-rubber.jpg" alt="">
+            </div>
+            {% endif %}
+           </div>
+    </div>
+    <div class="pb-6 px-10 ml-20  grid grid-cols-1 bg-green-500 rounded-xl"style="width:20%;height:60%;position: fixed;margin-left:25cm;margin-top:-34px;text-decoration: none;">
+    
+        <h3 class="font-bold flex justify-center">Categories</h3>
+        <div class="filter" style="height: 100%;width: 100%;overflow-y:auto;">
+        <ul>
+            {% for category in categories %}
+                <li class="py-2 px-2 rounded-xl {% if category.id == category_id|default:0%}bg-gray-500{% endif %}"style="width:90px">
+                <a href="{% url 'item:search' %}?query={{query}}&category={{category.id}}">{{category.name}}
+                {% endfor %}
+            </li>
+        </ul>
+        </div>
+        
+        
+        <ul>
+            <li><a href="{% url 'item:search' %}" class="mt-0 py-4 px-8 inline-block bg-yellow-500 text-lg rounded-xl text-white hover:bg-black">Clear-Filter</a></li>
+        </ul>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock%}

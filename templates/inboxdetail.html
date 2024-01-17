@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content  %}
+<div class="chatting" style="display: flex;">
+    <div class="leftimage" style="width: 50%;">
+        <img src="https://www.csr-online.net/wp-content/uploads/2020/06/people-speech-bubbles-chatting-communication-concept-vector-illustration-141568372.jpg" alt="" style="height: 600px;">
+    </div>
+<div class="space-y-6"style="margin-top:60px;width:50%;">
+    <h1 class="mb-6 text-3xl text-center text-blue-900 font-bold">Conversation</h1>
+    <div class="messages" style="max-height: 300px; overflow-y: scroll;">
+    {% for message in conversation.messages.all  %}
+    
+    <div class="p-6 flex {% if message.created_by == request.user %}bg-blue-700 ml-72 {% else %}bg-pink-500{% endif %} rounded-xl mt-6" style="width: 50%;">
+        
+       <div class="content" style="margin-top: -27px;">
+        <p class=""><strong>{{message.created_by.username}}</strong>@{{message.created_at}}</p>
+            <p class="mt-1">{{message.content}}</p>
+       </div>
+    </div>
+
+    {% endfor %}
+    </div>
+<form method="post" action="." class="mt-6" style="display: flex;">
+    {% csrf_token %}
+    {{form.as_p}}
+
+    <button class="text-lg bg-teal-500 hover:bg-teal-700 rounded-xl text-white" style="width: 60px; height: 35px;margin-top: 40px;"><i class="fa-solid fa-paper-plane"></i></button>
+</form>
+</div>
+</div>
+{% endblock  %}

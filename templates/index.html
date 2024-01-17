@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .indexitems :hover{
+        font-weight: bold;
+        text-decoration: dashed;
+        color: darkgray;
+    }
+    .cat a{
+        text-decoration: dashed;
+    }
+</style>
+<img class="w-full" src="https://source.unsplash.com/random/1920x1080/?laptops,computers" alt="" style="height: 245px; margin-top: 45px;">
+<div class="mt-6 px-6 py-12 bg-gray-100 round-xl">
+<div class="grid grid-cols-4 gap-3">
+    {% for itemm in items %}
+    <div class="indexitems">
+        <a href="{% url 'item:detail' itemm.id %}">
+        <div>
+            <img src="{{itemm.image1.url}}" class=" rounded-t-xl" style="height: 200px; width: 283px;">
+        </div>
+        <div class="p-6 bg-white rounded-b-xl ml-9">
+            <h2 class="text-2xl">{{itemm.name}}</h2>
+            <p class="text-gary-500">Price:{{itemm.price}}</p>
+        </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+</div>
+
+<div class="mt-6 px-6 py-12 bg-gray-100 round-xl cat">
+    <h2 class="nb-12 text-2xl text-center">Categories</h2>
+   <div class="grid grid-cols-4 gap-3">
+    {% for cat in categories  %}
+    <div>
+        <a href="#">
+           
+            <div class="p-6 bg-white rounded-b-xl">
+                <h2 class="text-2xl">{{cat.name}}</h2>
+                <p class="text-gray-500">{{cat.items.count}}-items</p>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+   </div>
+</div>
+{% endblock  %}
